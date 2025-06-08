@@ -1,0 +1,14 @@
+#-------base command
+rce:
+  network_discovery: ["hostname -I","nmcli device status","nmcli connection show","ip route show","ip addr show","ss -anp","ifconfig", "netstat -tuln", "ss -tuln" , "ss -tuln", "arp -a", "ip link show"]
+  account_discovery: ["last","grep -E '^sudo|^admin' /etc/group","whoami", "W","who","id", "getent host" ,"getent group" ,"getent passwd",  "cat /etc/passwd" , "cat /etc/group"]
+  file_and_directory_discovery: ["dir",  "find /home/user1/ -type f",  "ls -alR",  "df -h", " du -sh /home/",  "ls -lh",  "tree" ]
+  system_information_discovery: ["uname -a","vmstat","free -h","cat /etc/os-release","hostnamectl", "dmesg | head -5","lshw","lsb_release -a","cat /proc/cpuinfo","cat /proc/meminfo","uptime","uptime -p"]
+  system_service_discovery: ["service --status-all","ps -ef","ps aux", "systemctl is-active ssh","ps aux --sort=-%cpu" ]
+
+exfil: # file names on victims to be exfiltrated 
+  photo: ["photo/1.jpeg","photo/2.jpeg","photo/3.jpeg","photo/4.jpeg","photo/5.jpeg","photo/6.jpeg","photo/7.jpeg","photo/8.jpeg","photo/9.jpeg","photo/10.jpeg"]
+  pdf: ["pdf/1.pdf", "pdf/2.pdf"]
+  video: ["video/1.mp4","video/2.mp4"]
+  doc: ["doc/1.docx","doc/2.docx","doc/3.docx","doc/4.docx","doc/5.docx","doc/6.docx","doc/7.docx","doc/8.docx","doc/9.docx","doc/10.docx"]
+
