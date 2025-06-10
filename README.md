@@ -1,4 +1,4 @@
-# WebSocket Network Monitoring Tool
+# DeepRed Command and Control (C2)
 
 This repository contains a WebSocket-based Python application designed to simulate real-time DeepRed Command and Control (C2) communication. The project consists of two primary files: `c2-server.py` that initializes the C2 server and should be run first, and `bot.py` that represents an infected machine (bot). Once started, it prompts the user for configuration settings, including: defining the C2 server IP/Port, adversarial perturbation, traffic collection in a PCAP, etc.
 
