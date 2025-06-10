@@ -1,0 +1,6 @@
+# This file includes values for adversarial features (here e.g. src2dst_max_ps) 
+o realize the value 
+# i
+src2dst_max_ps: [
+      622.2105, 751.27386, 788.03485, 1471.9115, 960.26385, 809.9465, 1033.4388, 1042.5073,
+      1115.0743, 1284.9279]
