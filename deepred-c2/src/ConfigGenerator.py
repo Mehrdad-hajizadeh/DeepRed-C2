@@ -23,8 +23,9 @@ class config_generator:
             except yaml.YAMLError as exc:
                 print(exc)
         self.rce_list_generator()
-        #add probability to select if we add exfil or not
-        threshold = .2
+        #add arbitrary probability to select if we add exfil or not to the action list 
+        threshold = .4 # 40% probability to select exfil
+        flag = False
         rnd= random.random()
         if threshold:
             flag= rnd < threshold
@@ -69,6 +70,16 @@ class config_generator:
 
 
     def config_maker (self):
+        """
+        Generates a shuffled configuration dictionary by combining RCE (Remote Command Execution) and exfiltration items.
+        The method processes two lists: `flattened_rce_list` and `flattened_exfil_list`, assigning each item a unique key
+        (e.g., 'rce_0', 'exfil_0'). If additional keyword arguments (`kwargs`) are present, they are merged into the configuration
+        along with an underlying configuration dictionary (`underlaying_config`). The resulting dictionary is shuffled to randomize
+        the order of its items before being returned.
+
+        Returns:
+            dict: A shuffled dictionary containing RCE, exfiltration, and optionally additional configuration items.
+        """
         rce = {}
         exfil = {}
         for i, item in enumerate(self.flattened_rce_list):

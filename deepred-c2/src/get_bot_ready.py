@@ -101,7 +101,7 @@ def get_traffic_generation_configuration():
 
     if not config['adversarial'] and mode == "auto":
         rotate_count = get_user_input(
-            "How many indivdual flows shoud be generated in auto mode?", 
+            "How many indivdiual flows shoud be generated in auto mode (number of iterations)?", 
             default=1, 
             validator=lambda x: x.isdigit() and int(x) > 0
         )
@@ -174,7 +174,7 @@ def generate_atomic_combinations(config):
         result.append(new_config)
 
     return result
-
+"""
 bot_config = get_traffic_generation_configuration()
 print("===============Final configuration:===============")
 print(bot_config)
@@ -196,3 +196,4 @@ underlay_limit = { 'src2dst_packets': 0, 'src2dst_bytes': 0, 'src2dst_max_ps': 0
 atomic_config = generate_atomic_combinations(underlay_limit)
 for item in atomic_config:
     print(item)
+"""
