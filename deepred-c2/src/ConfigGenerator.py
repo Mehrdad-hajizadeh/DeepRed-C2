@@ -1,14 +1,3 @@
-"""
-27.2.2025
-- add probability to select exfil or not + reduce the number of selecting videos as it make pcap large
-----
-9.2.2025
-- This code create random action list to be executed during the bot-c2 communications
-- We see the communication as a disctionry of different actions. even underlaying configurations are also consider as one action to be executed.
-- there are termination limit which when exceed it will close the connections 
-see, project_note to get updated 
-"""
-
 from typing import List
 import psutil, socket, yaml, random, os
 import pandas as pd
