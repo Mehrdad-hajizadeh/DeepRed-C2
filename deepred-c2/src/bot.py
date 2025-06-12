@@ -151,7 +151,7 @@ async def main():
     print("================================================================")
 
     # loading bot_activitiy.yaml including commands to be executed on victim for system discovery or the data should be exfiled
-    script_dir = Path(__file__).parent.parent
+    script_dir = Path(__file__).resolve().parent.parent
     bot_activitiy_conf_path = script_dir  / "configs" / "bot_activity.yaml"
 
     # start capturing traffic if user asked for traffic collection and save in the following folder

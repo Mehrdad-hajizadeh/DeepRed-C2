@@ -79,6 +79,17 @@ def save_config(ip, port):
         json.dump({"ip": ip, "port": port}, f, indent=2)
 
 
+def prompt_check_termination_condition(default=False):
+    while True:
+        val = input(f"Enable check_termination_condition? [y/N] [Press Enter for {'No' if not default else 'Yes'}]: ").strip().lower()
+        if val == '':
+            return default
+        if val in ('y', 'yes'):
+            return True
+        if val in ('n', 'no'):
+            return False
+        print("❌ Please enter 'y' or 'n'.")
+
 def resolve_settings():
     config = load_config()
     available_ips = get_available_ips()
@@ -102,5 +113,8 @@ def resolve_settings():
     port = config.get("port", DEFAULT_PORT)
     port = prompt_port(port)
 
+    #check_termination_condition = config.get("check_termination_condition", False)
+    check_termination_condition = prompt_check_termination_condition(False)
+
     save_config(ip, port)
-    return ip, port, iface_name
+    return ip, port, iface_name, check_termination_condition

