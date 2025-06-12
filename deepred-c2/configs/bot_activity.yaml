@@ -9,5 +9,5 @@ rce:
 #-------exfiltration
 # Set the folder address where exfiltrated data will be stored
 exfil_data_address: "deepred-c2/sample_file_to_exfil"
-threshold: 0.2 # Set the threshold as probability of including exfil into action list  
+threshold: 0.2 # Set the threshold as probability of including exfil into action list (more probability means more chance of exfiltration)  
 

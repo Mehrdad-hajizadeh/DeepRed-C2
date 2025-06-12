@@ -77,8 +77,9 @@ class config_generator:
         """
         rce = {}
         exfil = {}
-        for i, item in enumerate(self.flattened_rce_list):
-            rce[f"rce_{i}"] = item
+        if len(self.flattened_rce_list) > 0:
+            for i, item in enumerate(self.flattened_rce_list):
+                rce[f"rce_{i}"] = item
         if len(self.flattened_exfil_list) > 0:
             for j, item in enumerate(self.flattened_exfil_list):
                 exfil[f"exfil_{j}"]= item

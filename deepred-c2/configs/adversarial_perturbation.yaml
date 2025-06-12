@@ -1,9 +1,15 @@
-# The configs are loaded by bot.py to be processed during the bot<->C2 communication.
-# This file includes pertubation values for adversarial features (here e.g. src2dst_max_ps) realization. 
-# The values will be realized in DeepRed C2 communication in the correspodning direction src2dst (bot to C2 ) or wise versa.
-# If payload needs to be modified, then random string is padded
-#
-src2dst_packets: [
-      622.2105, 751.27386, 788.03485, 1471.9115, 960.26385, 809.9465, 1033.4388, 1042.5073,
-      1115.0743, 1284.9279]
 
+# This configuration file is loaded by bot.py and is used to define parameters for bot-to-C2 (Command and Control) communication. Specifically, it contains perturbation values for adversarial feature manipulation—such as src2dst_max_ps—to simulate realistic yet evasive communication patterns.
+# The perturbation values are applied during DeepRed C2 communication in the corresponding direction, either src2dst (bot to C2) or dst2src (C2 to bot).
+# If features like *_bytes or *_max_ps are targeted, random strings will be padded to the message being sent in the respective direction. If *_packets features are involved, additional packets will be inserted into the communication accordingly.
+# The following adversarial features are subject to perturbation: 
+#[ 'src2dst_packets', 'src2dst_bytes', 'src2dst_max_ps', 'dst2src_packets', 'dst2src_bytes', 'dst2src_max_ps' ]
+
+
+# set define adversarial features and their perturbation values (DeepRed paper suggests either single or max 2 features to be set)
+src2dst_max_ps: [ 1284.9279]
+src2dst_bytes: [ 500.34] 
+src2dst_packets: [ 50.0]
+dst2src_max_ps: [ 1284.9279]
+dst2src_bytes: [ 500.34]
+dst2src_packets: [ 520.0]

