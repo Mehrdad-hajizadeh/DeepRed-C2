@@ -20,12 +20,14 @@ from pathlib import Path
 class Sniffer:
     """Packet sniffer that monitors WebSocket traffic and enforces termination conditions."""
     
-    def __init__(self, server, interface="ens19", protocol="tcp", port=5000):
+    def __init__(self, server, interface:str="ens19", ip:str="" , port:int=5000, protocol:str="tcp"):
         self.server = server  # Reference to WebSocket server
         self.conf = {
             "interface": interface,
+            "ip": ip,  # IP address to bind the sniffer
             "protocol": protocol,
             "port": port
+
         }
         self.seen_packets = set()  # Store seen packet identifiers
         self.running = False
@@ -72,8 +74,8 @@ class Sniffer:
             
     def run_sniffing(self):
         """Start sniffing packets in a separate thread."""
-        filter_rule = f"tcp and host 10.11.54.137 and port {self.conf['port']}"
-        print(f"Sniffing started with filter: {filter_rule} on {self.conf['interface']}")
+        filter_rule = f"{self.conf['protocol']} and host {self.conf['ip']} and port {self.conf['port']}"
+        print(f"Sniffing started with tcpdump filter: \033[94m{filter_rule} on interface: {self.conf['interface']}\033[0m")
         scapy.sniff(iface=self.conf["interface"], filter=filter_rule, prn=self.packet_callback, store=False)
  
     def print_statistics(self):
@@ -94,7 +96,6 @@ class Sniffer:
         self.running = True
         threading.Thread(target=self.run_sniffing, daemon=True).start()
         #threading.Thread(target=self.print_statistics, daemon=True).start()
-        print(f"Packet sniffer started on interface '{self.conf['interface']}' monitoring {self.conf['protocol'].upper()} port {self.conf['port']}")
 
     def stop(self):
         """Stop sniffing."""
@@ -102,17 +103,16 @@ class Sniffer:
 
 class WebSocketServer:
 
-    def __init__(self,  check_termination_condition:bool= False ):
+    def __init__(self,  check_termination_condition:bool= False, iface_name:str="lo" ,ip:str="", port:int=5000):
         self.check_termination_condition= check_termination_condition
-        #self.underlay_limit = underlay_limit 
+        self.iface_name = iface_name  # Network interface name
         self.clients = {}  # Stores client stats
-        self.sniffer = Sniffer(self)  # Attach the Sniffer class
+        self.sniffer = Sniffer(self,interface=self.iface_name,ip=ip ,port=port)  # Attach the Sniffer class
         self.loop = asyncio.get_event_loop()
         self.sniffer.start()
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         #set relative path
         self.parent_folder  = Path(__file__).resolve().parent.parent
-        print(self.parent_folder)
         # Ensure the log directory exists
         log_dir = f"{self.parent_folder}/log"
         if not os.path.exists(log_dir):
@@ -299,17 +299,18 @@ class WebSocketServer:
         )
     async def start(self, ip, port):
         async with websockets.serve(self.handle_client, ip, port):
+            print("=" * 60)
             print(f"🚀 Starting \033[91mDeepRed\033[0m server on WebSocket://{ip}:{port}/")
-            #ptint locations logs, exfil 
-            #remove sniffer Klass as it is done in bot
+            print("=" * 60)
+
             await asyncio.Future()  # Keep running
 
 
 
 
 async def main():
-    ip, port = resolve_settings()
-    server = WebSocketServer(check_termination_condition=False )
+    ip, port, iface_name = resolve_settings() # ip, port, iface_name (interface name) = resolve_settings(
+    server = WebSocketServer(check_termination_condition=True , iface_name=iface_name, ip=ip,port=port) 
     await server.start(ip, port)
 if __name__ == "__main__":
     asyncio.run(main())

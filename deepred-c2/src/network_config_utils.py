@@ -90,8 +90,17 @@ def resolve_settings():
         ip = default_ip
     ip = prompt_ip(ip, available_ips)
 
+    # Find the interface corresponding to the selected IP
+    iface_name = None
+    for iface in netifaces.interfaces():
+        addrs = netifaces.ifaddresses(iface)
+        ips = [addr['addr'] for addr in addrs.get(netifaces.AF_INET, [])]
+        if ip in ips:
+            iface_name = iface
+            break
+
     port = config.get("port", DEFAULT_PORT)
     port = prompt_port(port)
 
     save_config(ip, port)
-    return ip, port
+    return ip, port, iface_name

@@ -7,9 +7,6 @@
 
 
 # set define adversarial features and their perturbation values (DeepRed paper suggests either single or max 2 features to be set)
-src2dst_max_ps: [ 1284.9279]
-src2dst_bytes: [ 500.34] 
-src2dst_packets: [ 50.0]
-dst2src_max_ps: [ 1284.9279]
-dst2src_bytes: [ 500.34]
-dst2src_packets: [ 520.0]
+src2dst_max_ps: [ 1284.9279, 900.234]
+src2dst_packets: [ 502.0, 800]
+

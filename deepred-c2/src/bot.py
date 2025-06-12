@@ -26,7 +26,7 @@ from get_bot_ready import get_traffic_generation_configuration, generate_atomic_
 
 
 class persistent_connection_via_websocket():
-    def __init__(self, bot_config, server="localhost", server_port=5000):
+    def __init__(self, bot_config, server="127.0.0.1", server_port=5000):
         self.bot_config = bot_config
         self.server = server
         self.server_port = server_port
@@ -75,7 +75,7 @@ class persistent_connection_via_websocket():
                 elif "src2dst_max_ps" in list(command_data.keys())[0] and command_data["src2dst_max_ps"] != None:
                     pad= self.generate_random_string(command_data["src2dst_max_ps"][0])
                     await websocket.send(pad)
-                    
+
                 elif "dst2src_max_ps" in list(command_data.keys())[0] and command_data["dst2src_max_ps"] != None:
                     await websocket.recv()
                 elif "src2dst_packets" in list(command_data.keys())[0] and command_data["src2dst_packets"] != None:
@@ -107,10 +107,10 @@ class persistent_connection_via_websocket():
             await self.websocket.wait_closed()
 
   #--------------starting the code----------------------------
-def start_tcpdump( interface: str, output_file):
+def start_tcpdump( interface: str, port:int,output_file:str):
     #command = ["tcpdump", "-i", interface, "-w", output_file]
     #tcpdump_process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
-    command = ["tcpdump", "-i", interface, "port 5000", "-w", output_file]
+    command = ["tcpdump", "-i", interface, f"port {port}", "-w", output_file]
     tcpdump_process = subprocess.Popen(command, preexec_fn=os.setsid)
     return tcpdump_process
 def stop_tcpdump( process):
@@ -123,10 +123,13 @@ def bot_activity_conf_generator(config_file_addr:str,**kwargs):
     termination = {}
     cnf_gen= config_generator(config_file_addr)
     exec_conf= cnf_gen.config_maker()
-    #--------------make termination based on termination condition and value set in underlaying
-    if "termination_conditions" in input_kwargs.keys(): 
-        for item in input_kwargs["termination_conditions"]:
-            termination[item] = input_kwargs["underlay_limit"][item]
+    #--------------check all keys in input_kwargs and check if they in adverasial feature list
+    # 
+    adversarial_feature_list = [ 'src2dst_packets', 'src2dst_bytes', 'src2dst_max_ps', 'dst2src_packets', 'dst2src_bytes', 'dst2src_max_ps' ]
+    termination["underlay_limit"] = {}
+    for key, item in input_kwargs.items():
+        if key in adversarial_feature_list:
+            termination["underlay_limit"][key] = int(item[0]) if isinstance(item, list) else item
 
     #--------------
     
@@ -154,7 +157,9 @@ async def main():
     # start capturing traffic if user asked for traffic collection and save in the following folder
     if traffic_generation_config["capture_pcap"]:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        tcpdump_process = start_tcpdump(traffic_generation_config["pcap_interface"], f"{traffic_generation_config['pcap_save_path']}/{current_time}.pcap")
+        tcpdump_process = start_tcpdump(interface=traffic_generation_config["pcap_interface"], 
+                                        port=traffic_generation_config["port"],
+                                        output_file= f"{traffic_generation_config['pcap_save_path']}/{current_time}.pcap")
     
     # check if user wanted to realize adevrsarial pertubation values during bot<->C2 communication
     if traffic_generation_config["adversarial"]:
@@ -170,7 +175,7 @@ async def main():
                 break
         #generate atomic configs according to the underlaying limit values for each indvidual flow
         atomic_config_list = generate_atomic_combinations(underlay_limit)
-        
+        print("\033[94mTotal iterations according to defined adversarial features: \033[0m", len(atomic_config_list))
         for i, flow_config in enumerate(atomic_config_list):
 
             # get randomly selected list of commands (Remote Command Execution and Exfiltration) which has been mixed with indvidual atomic config    
