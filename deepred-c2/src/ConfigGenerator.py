@@ -1,6 +1,7 @@
 from typing import List
 import psutil, socket, yaml, random, os
 import pandas as pd
+from pathlib import Path
 
 
 class config_generator:
@@ -11,15 +12,16 @@ class config_generator:
                 self.config = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
                 print(exc)
-        self.rce_list_generator()
+        self.flattened_rce_list = self.rce_list_generator()
+        
         #add arbitrary probability to select if we add exfil or not to the action list 
-        threshold = .9 # 40% probability to select exfil
+        threshold = self.config["threshold"] # probability to select exfil
         flag = False
         rnd= random.random()
         if threshold:
             flag= rnd < threshold
         if flag:
-            self.exfil_list_generator()
+            self.flattened_exfil_list =self.exfil_list_generator()
         else:
             self.flattened_exfil_list= []
         if self.kwargs:
@@ -37,13 +39,15 @@ class config_generator:
         discovery_action_list= random.choices(list(self.config["rce"].keys()), k=random.randint(1,len(list(self.config["rce"].keys()))))
         for action in discovery_action_list:
             rce_rnd_action_list.append(random.choices(self.config["rce"][action], k=random.randint(1,len(self.config["rce"][action]))))
-        self.flattened_rce_list = self.flatten_list(rce_rnd_action_list)
+        flattened_rce_list = self.flatten_list(rce_rnd_action_list)
+        return flattened_rce_list
     def exfil_list_generator(self):
-        sample_data_for_exfil_path = self.config["exfil_data_address"] # path to the sample data for exfiltration configs/bot_activity.yaml
-        
+        # Ensure the path is absolute; if not, make it relative to the config file's directory
+        sample_data_for_exfil_path = self.config["exfil_data_address"]        
         # Collect all file paths except readme.txt
         all_files = []
-        for root, dirs, files in os.walk(sample_data_for_exfil_path):
+        exfil_dir = Path(__file__).resolve().parents[2]/sample_data_for_exfil_path 
+        for root, _, files in os.walk(exfil_dir):
             for file in files:
                 if file.lower() != "readme.txt":
                     all_files.append(os.path.join(root, file))
@@ -53,14 +57,11 @@ class config_generator:
             selected_files = random.sample(all_files, num_files)
         else:
             selected_files = []
-
-
-        self.flattened_exfil_list = self.flatten_list(selected_files)
+        flattened_exfil_list = self.flatten_list(selected_files)
+        return flattened_exfil_list
     def add_underlaying_config(self):
         if self.kwargs: # expilicitly determin the params in the 
             self.underlaying_config = {key: value for key, value in self.kwargs.items()}
-        #else: # if not then use it from config file itseld
-            #self.underlaying_config = 
 
 
     def config_maker (self):

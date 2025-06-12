@@ -35,6 +35,12 @@ def is_port_available(port):
 
 
 def prompt_ip(default_ip, available_ips):
+    print("Available network interfaces and their IP addresses:")
+    for iface in netifaces.interfaces():
+        addrs = netifaces.ifaddresses(iface)
+        ips = [addr['addr'] for addr in addrs.get(netifaces.AF_INET, [])]
+        if ips:
+            print(f"  {iface}: {', '.join(ips)}")
     while True:
         ip_input = input(f"Enter IP address to bind \033[91mDeepRed\033[0m C2 server [Press Enter to use {default_ip}]: ").strip()
         ip = ip_input if ip_input else default_ip

