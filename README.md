@@ -97,7 +97,7 @@ python bot.py
 │   ├── configs/              # All runtime-generated configs
 │   ├── exfiled_data/         # Default folder for received files on the server
 │   ├── log/                  # Communication logs for each connected bot
-│   ├── pcap/                 # Saved PCAP files (if enabled by the user)
+│   ├── pcap/                 # Saved PCAP files (if enabled by the user when running the bot.py)
 │   ├── sample_file_to_exfil/ # Sample documents for exfiltration
 │   │   ├── doc/
 │   │   ├── pdf/
@@ -118,6 +118,46 @@ python bot.py
 If you get permission errors related to file writing or access:
 ```bash
 sudo chmod -R 777 configs log pcap exfiled_data
+```
+---
+
+##  Example Interactive Session: ```c2-server.py```
+
+```bash
+$ python c2-server.py
+
+ Available network interfaces and their IP addresses:
+  - lo: 127.0.0.1
+  - eth0: 192.168.1.50
+
+ Enter IP address to bind DeepRed C2 server [Press Enter to use 127.0.0.1]: 192.168.1.50
+ Enter port for DeepRed C2 server [Press Enter to use 5000]: 5000
+
+ Enable check_termination_condition? [y/N] [Press Enter for No]: 
+
+ DeepRed C2 server initialized at ws://192.168.1.50:5000/
+ Waiting for bots to connect...
+```
+
+##  Example Interactive Session: ```bot.py```
+```bash
+$ python bot.py
+
+ Enter the IP address of DeepRed C2 server [127.0.0.1]: 192.168.1.50
+ Enter the port number of the DeepRed C2 server [5000]: 5000
+
+ Is adversarial perturbation required? [no]: 
+
+ How many indivdiual flows shoud be generated in (number of iterations)? [1]: 5
+
+ Capture traffic in PCAP? [no]: yes
+
+ Available interfaces: ['lo', 'eth0', 'wlan0']
+ Matching default interface: eth0
+→ Enter the interface to capture on ['eth0']: 
+Default directory:['deepred-c2/pcap']
+Enter the folder path to save PCAP (leave blank for current)['deepred-c2/pcap']:
+
 ```
 ---
 ## 📄 Citation

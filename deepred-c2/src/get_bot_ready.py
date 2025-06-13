@@ -53,13 +53,7 @@ def get_traffic_generation_configuration():
     )
     config['server_port'] = int(port)
 
-    # 🔁 Execution mode
-    mode = get_user_input(
-        "Bot execution in 'auto' or 'manual' mode?", 
-        default="auto", 
-        validator=lambda x: x.lower() in ["auto", "manual"]
-    ).lower()
-    config['mode'] = mode
+
 
     # Adversarial perturbation
     adv_required = get_user_input(
@@ -99,9 +93,9 @@ def get_traffic_generation_configuration():
                     except ValueError:
                         print("⚠️  Invalid number format. Skipping entry.")
 
-    if not config['adversarial'] and mode == "auto":
+    if not config['adversarial'] :
         rotate_count = get_user_input(
-            "How many indivdiual flows shoud be generated in auto mode (number of iterations)?", 
+            "How many indivdiual flows shoud be generated in (number of iterations)?", 
             default=1, 
             validator=lambda x: x.isdigit() and int(x) > 0
         )

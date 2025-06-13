@@ -303,10 +303,10 @@ class WebSocketServer:
         async with websockets.serve(self.handle_client, ip, port):
             print("=" * 60)
             print(f"🚀 Starting \033[91mDeepRed\033[0m server on WebSocket://{ip}:{port}/")
+            print("🕸️ Waiting for bots to connect...")
             print("=" * 60)
 
             await asyncio.Future()  # Keep running
-
 
 
 
