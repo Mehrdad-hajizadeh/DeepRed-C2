@@ -4,6 +4,7 @@ Welcome to the **DeepRed-C2** repository, a WebSocket-based Python application d
 
 ⚠️ Disclaimer:
 This repository is provided strictly for academic and research purposes only. The authors are not responsible for any misuse or unintended consequences.
+During bot-to-C2 communication, all changes occur strictly within the project folder. For example, in the case of exfiltration, sample files located in ```deepred-c2/sample_file_to_exfil``` on the bot side are randomly selected and exfiltrated to the C2 server. The exfiltrated data will be stored under ```deepred-c2/exfiled_data``` on the server.
 
 ---
 
