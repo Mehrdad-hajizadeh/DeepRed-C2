@@ -58,23 +58,7 @@ pip install -r requirements.txt
 ## ▶️ Running the Code
 Both programs will prompt you for runtime settings like C2 IP, port, adversarial configuration, and optional traffic capture.
 
-### Scapy and Tcpdump Permissions
-⚠️ **Attention:**  
-For traffic sniffing and PCAP capturing, it is essential to grant the required system-level privileges. Without these, tools used in bot.py (`tcpdump`) or c2-sever.py (`scapy`) may fail to operate properly.
-
-For ```bot.py``` (uses tcpdump before running the code):
-
-```bash
-sudo setcap cap_net_raw,cap_net_admin=eip $(which tcpdump)
-```
-For ```c2-server.py``` (uses scapy):
-
-```bash
-sudo setcap cap_net_raw,cap_net_admin=eip $(which scapy)
-```
-
-
-### Start the C2 Server
+### Start the DeepRed C2 Server
 
 ```bash
 cd deepred-c2/src
@@ -87,40 +71,6 @@ cd deepred-c2/src
 python bot.py
 ```
 ---
-## 🗂️ Project Structure
-
-
-```bash
-.
-├── dataset       #TUC-RedTeam30: Generated dataset including benign and attack netwrork traffic, collected during 30 different red teaming exercises
-├── deepred-c2
-│   ├── configs/              # All runtime-generated configs
-│   ├── exfiled_data/         # Default folder for received files on the server
-│   ├── log/                  # Communication logs for each connected bot
-│   ├── pcap/                 # Saved PCAP files (if enabled by the user when running the bot.py)
-│   ├── sample_file_to_exfil/ # Sample documents for exfiltration
-│   │   ├── doc/
-│   │   ├── pdf/
-│   │   ├── photo/
-│   │   └── video/
-│   ├── src/
-│   │   ├── c2-server.py
-│   │   ├── bot.py
-│   │   ├── get_bot_ready.py
-│   │   ├── ConfigGenerator.py
-│   │   ├── network_config_utils.py  
-
-```
----
-##  🧰 Troubleshooting
-
-### 🔐 Permission Issues
-If you get permission errors related to file writing or access:
-```bash
-sudo chmod -R 777 configs log pcap exfiled_data
-```
----
-
 ##  📝 Example Interactive Session:
 
 This example first demonstrates the execution of the DeepRed C2 server without traffic monitoring enabled. The infected bot connects to the C2 server without triggering any adversarial perturbations. This setup showcases how a compromised system can establish a connection with the C2 server and receive various commands for system discovery and data exfiltration.
@@ -157,12 +107,63 @@ $ python bot.py
  Capture traffic in PCAP? [no]: yes
 
  Available interfaces: ['lo', 'eth0', 'wlan0']
- Matching default interface: eth0
-→ Enter the interface to capture on ['eth0']: 
-Default directory:['deepred-c2/pcap']
-Enter the folder path to save PCAP (leave blank for current)['deepred-c2/pcap']:
+ Enter the interface to capture on ['eth0']: 
+ Default directory:['deepred-c2/pcap']
+ Enter the folder path to save PCAP (leave blank for current)['deepred-c2/pcap']:
 
 ```
+---
+## 🗂️ Project Structure
+
+
+```bash
+.
+├── dataset       #TUC-RedTeam30: Generated dataset including benign and attack netwrork traffic, collected during 30 different red teaming exercises
+├── deepred-c2
+│   ├── configs/              # All runtime-generated configs
+│   ├── exfiled_data/         # Default folder for received files on the server
+│   ├── log/                  # Communication logs for each connected bot
+│   ├── pcap/                 # Saved PCAP files (if enabled by the user when running the bot.py)
+│   ├── sample_file_to_exfil/ # Sample documents for exfiltration
+│   │   ├── doc/
+│   │   ├── pdf/
+│   │   ├── photo/
+│   │   └── video/
+│   ├── src/
+│   │   ├── c2-server.py
+│   │   ├── bot.py
+│   │   ├── get_bot_ready.py
+│   │   ├── ConfigGenerator.py
+│   │   ├── network_config_utils.py  
+
+```
+---
+##  🧰 Troubleshooting
+
+### 🔐 Permission Issues
+#### Scapy and Tcpdump
+⚠️ **Attention:**  
+For traffic sniffing and PCAP capturing, it is essential to grant the required system-level privileges. Without these, tools used in bot.py (`tcpdump`) or c2-sever.py (`scapy`) may fail to operate properly.
+
+For ```bot.py``` (uses tcpdump before running the code):
+
+```bash
+sudo setcap cap_net_raw,cap_net_admin=eip $(which tcpdump)
+```
+For ```c2-server.py``` (uses scapy):
+
+```bash
+sudo setcap cap_net_raw,cap_net_admin=eip $(which scapy)
+```
+#### Enable Write Access to the Folder
+If you get permission errors related to file writing or access:
+```bash
+sudo chmod -R 777 configs log pcap exfiled_data
+```
+### 🌐 Network Connectivity 
+
+If you're running the bot on a separate machine, make sure it can reach the DeepRed C2 server over the network — they need to be able to ping each other and communicate without firewall or routing issues.
+
 ---
 ## 📄 Citation
 
