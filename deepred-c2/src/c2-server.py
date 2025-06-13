@@ -1,4 +1,4 @@
-"This is DeepRed C2"
+"This is DeepRed C2 server"
 import asyncio
 import websockets
 import json

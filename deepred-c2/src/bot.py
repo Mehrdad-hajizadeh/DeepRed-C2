@@ -1,24 +1,8 @@
-"""
-*****main file****** 
-19.2.2025
-To be able to conduct tcpdump wihtou using sudo for running the code u need to make exception
-for tcpdump first using the following in the terminal:
-sudo setcap cap_net_raw,cap_net_admin=eip $(which tcpdump)
----------config generator-----
-    - Each client consist of 2 different configs which are combined: rce/exfil and adversarial requirements
-    - Both will be generated in client side and send to server but server will control on execution of each and their termination conditions
-    - After client is connected, it sends client_config including: underlaying limit,termination condition, src2dst/dst2src_max_ps
-    - Then client_config would be added to the generated config in server side 
-    - This way allows us to dynamically run bots with different config and criteria while capturing pcap
-    - Why in client side? because client is dynamic created and deleted but server is run one time for ever, thus hard to manage different dynamic config requirements
-
-"""
 from pathlib import Path
 import asyncio
 import websockets, string
 import json, os, random, yaml
 from datetime import datetime
-
 import subprocess, signal, traceback
 from concurrent.futures import TimeoutError as ConnectionTimeoutError
 from ConfigGenerator import config_generator

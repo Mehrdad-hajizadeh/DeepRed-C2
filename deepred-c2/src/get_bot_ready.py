@@ -150,8 +150,6 @@ def generate_atomic_combinations(config):
     Each config then will be considers as constraint to stop the flow. 
     """
     list_keys = [k for k, v in config.items() if isinstance(v, list)]
-    #scalar_keys = [k for k, v in config.items() if not isinstance(v, list)]
-
     # If no lists, return the config itself as a single combination
     if not list_keys:
         return [config]
@@ -173,26 +171,3 @@ def generate_atomic_combinations(config):
         result.append(new_config)
 
     return result
-"""
-bot_config = get_traffic_generation_configuration()
-print("===============Final configuration:===============")
-print(bot_config)
-
-underlay_limit = { 'src2dst_packets': 0, 'src2dst_bytes': 0, 'src2dst_max_ps': 0, 'dst2src_packets': 0, 'dst2src_bytes': 0, 'dst2src_max_ps': 0 }
-
-
-for key, item in bot_config["adversarial_config"].items():
-    if key in underlay_limit.keys():
-        underlay_limit[key] = item
-    else:
-        print(f"❌ Adversarial feature has not found")
-        break
-
-print(underlay_limit)
-
-
-underlay_limit = { 'src2dst_packets': 0, 'src2dst_bytes': 0, 'src2dst_max_ps': 0, 'dst2src_packets': 0, 'dst2src_bytes': 0, 'dst2src_max_ps': 0 }
-atomic_config = generate_atomic_combinations(underlay_limit)
-for item in atomic_config:
-    print(item)
-"""
