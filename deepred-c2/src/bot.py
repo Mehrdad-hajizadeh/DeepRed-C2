@@ -158,7 +158,7 @@ async def main():
     if traffic_generation_config["capture_pcap"]:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         tcpdump_process = start_tcpdump(interface=traffic_generation_config["pcap_interface"], 
-                                        port=traffic_generation_config["port"],
+                                        port=traffic_generation_config["server_port"],
                                         output_file= f"{traffic_generation_config['pcap_save_path']}/{current_time}.pcap")
     
     # check if user wanted to realize adevrsarial pertubation values during bot<->C2 communication

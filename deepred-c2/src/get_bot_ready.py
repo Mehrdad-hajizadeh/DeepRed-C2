@@ -51,7 +51,7 @@ def get_traffic_generation_configuration():
         default="5000", 
         validator=is_valid_port
     )
-    config['port'] = int(port)
+    config['server_port'] = int(port)
 
     # 🔁 Execution mode
     mode = get_user_input(
