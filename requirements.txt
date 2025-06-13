@@ -7,3 +7,5 @@ PyYAML==6.0.2
 six==1.17.0
 tzdata==2025.2
 websockets==15.0.1
+netifaces==0.11.0
+scapy==2.6.1
