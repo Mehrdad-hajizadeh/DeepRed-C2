@@ -2,6 +2,9 @@
 
 Welcome to the **DeepRed-C2** repository, a WebSocket-based Python application designed to simulate real-time Command and Control (C2) communication. This project was developed as a reproducible artifact for our [USENIX WOOT'25](https://www.usenix.org/conference/woot25) paper and aims to provide an interactive environment for studying adversarial C2 behaviors in networked systems.
 
+⚠️ Disclaimer:
+This repository is provided strictly for academic and research purposes only. The authors are not responsible for any misuse or unintended consequences.
+
 ---
 
 ## 📦 Overview
