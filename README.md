@@ -121,7 +121,11 @@ sudo chmod -R 777 configs log pcap exfiled_data
 ```
 ---
 
-##  Example Interactive Session: ```c2-server.py```
+##  📝 Example Interactive Session:
+
+This example first demonstrates the execution of the DeepRed C2 server without traffic monitoring enabled. The infected bot connects to the C2 server without triggering any adversarial perturbations. This setup showcases how a compromised system can establish a connection with the C2 server and receive various commands for system discovery and data exfiltration.
+
+#### ```c2-server.py```
 
 ```bash
 $ python c2-server.py
@@ -139,7 +143,7 @@ $ python c2-server.py
  Waiting for bots to connect...
 ```
 
-##  Example Interactive Session: ```bot.py```
+#### ```bot.py```
 ```bash
 $ python bot.py
 
