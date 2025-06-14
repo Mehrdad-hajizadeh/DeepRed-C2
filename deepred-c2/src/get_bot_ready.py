@@ -95,7 +95,7 @@ def get_traffic_generation_configuration():
 
     if not config['adversarial'] :
         rotate_count = get_user_input(
-            "How many indivdiual flows shoud be generated in (number of iterations)?", 
+            "How many indivdiual flows shoud be generated (number of iterations)?", 
             default=1, 
             validator=lambda x: x.isdigit() and int(x) > 0
         )

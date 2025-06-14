@@ -16,6 +16,8 @@ This application emulates a botnet communication system comprising:
 - `bot.py`: represents an infected bot that connects to the server.
 - Runtime configuration is interactively defined (IP, port, adversarial settings, PCAP capture, etc.).
 
+Sample DeepRed C2 operation upon bot connection request
+
 ![alt text](image.png)
 
 ---

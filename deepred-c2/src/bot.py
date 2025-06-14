@@ -12,6 +12,7 @@ from get_bot_ready import get_traffic_generation_configuration, generate_atomic_
 class persistent_connection_via_websocket():
     def __init__(self, bot_config, server="127.0.0.1", server_port=5000):
         self.bot_config = bot_config
+        
         self.server = server
         self.server_port = server_port
     def generate_random_string(self,size:int):
