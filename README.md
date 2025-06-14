@@ -86,6 +86,8 @@ python bot.py
 
 This example first demonstrates the execution of the DeepRed C2 server without traffic monitoring enabled. The infected bot connects to the C2 server without triggering any adversarial perturbations. This setup showcases how a compromised system can establish a connection with the C2 server and receive various commands for system discovery and data exfiltration.
 
+Once DeepRed C2 is running, it will continue operating until manually stopped (e.g., with ```Ctrl+C```). Multiple bots can connect concurrently to the C2 server and begin communication sessions. For each connected bot, the connection remains active until the bot completes all its iterations. Each iteration consists of a randomly predefined list of actions (RCE and data exfilteration) to be executed sequentially. If data capture is enabled during the execution of ```bot.py```, all communication for the respective bot will be recorded and saved in PCAP format. These capture files will be stored either in the default directory or a user-specified directory.
+
 #### ```c2-server.py```
 
 ```bash
@@ -123,7 +125,13 @@ $ python bot.py
  Enter the folder path to save PCAP (leave blank for current)['deepred-c2/pcap']:
 
 ```
+The GIF below demonstrates a sample DeepRed C2 operation. It shows how each command in the bot’s action list is executed, and how DeepRed C2 prints a corresponding message upon receiving each output from the bot. Since traffic capture is enabled during the execution of ```bot.py```, the full communication is recorded and saved in PCAP format. These capture files can be found under the ```deepred-c2/pcap/``` directory.
+
 ![alt text](demo.gif)
+
+#### Note:
+If you plan to conduct adversarial perturbations during communication, please consider that these perturbations are applied on a single flow, as DeepRed uses a modern WebSocket-based full-duplex communication protocol for long-last flow.
+This means that when an action list is prepared and executed, adversarial features are actively monitored by the C2 server using the Scapy Python library for packet analysis during the connection. To implement perturbations, either packets are injected, or random strings are padded (to increase byte size) to meet the adversarial feature requirements. Once these adversarial criteria are fulfilled for the specific flow (i.e., the current action list), the connection for that bot will be terminated.
 
 ---
 ## 🗂️ Project Structure
