@@ -19,15 +19,18 @@ This application emulates a botnet communication system comprising:
 - `bot.py`: represents an infected bot that connects to the server.
 - Runtime configuration is interactively defined (IP, port, adversarial settings, PCAP capture, etc.).
 
-Sample DeepRed C2 operation upon bot connection request
+Sample DeepRed C2 operation upon the bot connection request
 
 ![alt text](image.png)
 
 ---
 
 ## ⚙️ System Requirements
+⏱️ Estimated Setup Time: ~5 minutes
 
-This application has been tested on **Linux (Ubuntu 20.04)**.
+💾 Disk Space Requirement: Approximately 2 GB (also including TUC-RedTeam30 Dataset)
+
+🐧 This application has been tested on **Linux (Ubuntu 20.04)**.
 
 ### ✅ Install Python 3.11+ and Dependencies
 
