@@ -5,9 +5,8 @@ Welcome to the **DeepRed-C2** repository, a WebSocket-based Python application d
 📄 Paper title:
 DeepRed: A Deep Learning–Powered Command and Control Framework for Multi-Stage Red Teaming Against ML-based Network Intrusion Detection Systems
 
-⚠️ Disclaimer:
-This repository is provided strictly for academic and research purposes only. The authors are not responsible for any misuse or unintended consequences.
-During bot-to-C2 communication, all changes occur strictly within the project folder. For example, in the case of exfiltration, sample files located in ```deepred-c2/sample_file_to_exfil``` on the bot side are randomly selected and exfiltrated to the C2 server. The exfiltrated data will be stored under ```deepred-c2/exfiled_data``` on the server.
+📚 Dataset title: 
+TUC-RedTeam30: A Dataset for Evaluating ML-Based Network Intrusion Detection Systems (https://doi.org/10.5281/zenodo.15662906)
 
 ---
 
@@ -181,4 +180,17 @@ If you're running the bot on a separate machine, make sure it can reach the Deep
 ---
 ## 📄 Citation
 
-### DeepRed: A Deep Learning–Powered Command and Control Framework for Multi-Stage Red Teaming Against ML-based Network Intrusion Detection Systems
+Paper: 
+```bash
+DeepRed: A Deep Learning–Powered Command and Control Framework for Multi-Stage Red Teaming Against ML-based Network Intrusion Detection Systems
+```
+
+Dataset:
+```bash
+Hajizadeh, M., Golchin, P., Nowroozi, E., Rigaki, M., Valeros, V., Garcia, S., Conti, M., & Bauschert, T. (2025). TUC-RedTeam30: A Dataset for Evaluating ML-Based Network Intrusion Detection Systems [Data set]. USENIX WOOT Conference on Offensive Technologies (USENIX WOOT'25), Seattle, WA, USA. Zenodo. https://doi.org/10.5281/zenodo.15662906
+```
+
+---
+⚠️ Disclaimer:
+This repository is provided strictly for academic and research purposes only. The authors are not responsible for any misuse or unintended consequences.
+During bot-to-C2 communication, all changes occur strictly within the project folder. For example, in the case of exfiltration, sample files located in ```deepred-c2/sample_file_to_exfil``` on the bot side are randomly selected and exfiltrated to the C2 server. The exfiltrated data will be stored under ```deepred-c2/exfiled_data``` on the server.
