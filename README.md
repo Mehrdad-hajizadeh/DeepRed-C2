@@ -16,6 +16,8 @@ This application emulates a botnet communication system comprising:
 - `bot.py`: represents an infected bot that connects to the server.
 - Runtime configuration is interactively defined (IP, port, adversarial settings, PCAP capture, etc.).
 
+![alt text](image.png)
+
 ---
 
 ## ⚙️ System Requirements
@@ -29,6 +31,7 @@ Before running the code, make sure Python 3.11 and related system dependencies a
 ```bash
 sudo apt update
 sudo apt install git python3.11-venv python3.11-distutils python3.11-dev python3-pip
+sudo apt install tcpdump
 ```
 
 Then verify pip is compatible:
@@ -113,6 +116,8 @@ $ python bot.py
  Enter the folder path to save PCAP (leave blank for current)['deepred-c2/pcap']:
 
 ```
+![alt text](demo.gif)
+
 ---
 ## 🗂️ Project Structure
 
