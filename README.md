@@ -6,7 +6,7 @@ Welcome to the **DeepRed-C2** repository, a WebSocket-based Python application d
 DeepRed: A Deep Learning–Powered Command and Control Framework for Multi-Stage Red Teaming Against ML-based Network Intrusion Detection Systems
 
 📚 Dataset title: 
-TUC-RedTeam30: A Dataset for Evaluating ML-Based Network Intrusion Detection Systems (https://doi.org/10.5281/zenodo.15662906)
+TUC-RedTeam30: A Dataset for Evaluating ML-Based Network Intrusion Detection Systems (https://doi.org/10.5281/zenodo.15668685)
 
 ---
 
@@ -195,7 +195,7 @@ DeepRed: A Deep Learning–Powered Command and Control Framework for Multi-Stage
 
 Dataset:
 ```bash
-Hajizadeh, M., Golchin, P., Nowroozi, E., Rigaki, M., Valeros, V., Garcia, S., Conti, M., & Bauschert, T. (2025). TUC-RedTeam30: A Dataset for Evaluating ML-Based Network Intrusion Detection Systems [Data set]. USENIX WOOT Conference on Offensive Technologies (USENIX WOOT'25), Seattle, WA, USA. Zenodo. https://doi.org/10.5281/zenodo.15662906
+Hajizadeh, M., Golchin, P., Nowroozi, E., Rigaki, M., Valeros, V., Garcia, S., Conti, M., & Bauschert, T. (2025). TUC-RedTeam30: A Dataset for Evaluating ML-Based Network Intrusion Detection Systems [Data set]. USENIX WOOT Conference on Offensive Technologies (USENIX WOOT'25), Seattle, WA, USA. Zenodo. https://doi.org/10.5281/zenodo.15668685
 ```
 
 ---
